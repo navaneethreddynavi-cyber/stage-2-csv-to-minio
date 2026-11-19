@@ -1,0 +1,12 @@
+.env
+/minio
+minio-source/
+output/
+logs/
+customer_care_emails/*
+!customer_care_emails/manifest.yaml
+!customer_care_emails/schema_contract.yaml
+dags/extraction/sample.csv
+*.backup
+__pycache__/
+*.pyc

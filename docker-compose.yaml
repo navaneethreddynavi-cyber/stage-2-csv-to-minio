@@ -1,0 +1,68 @@
+services:
+  minio:
+    image: stage2-minio:local
+    container_name: stage2_minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    env_file:
+      - .env
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  airflow-postgres:
+    image: postgres:16
+    container_name: stage2_airflow_postgres
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow_local_password
+      POSTGRES_DB: airflow
+    volumes:
+      - airflow_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  airflow:
+    build:
+      context: .
+      dockerfile: Dockerfile.airflow
+    container_name: stage2_airflow
+    depends_on:
+      airflow-postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow_local_password@airflow-postgres/airflow
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__CORE__DAGS_FOLDER: /opt/airflow/dags
+      AIRFLOW__WEBSERVER__WORKERS: "1"
+      MINIO_ENDPOINT: minio:9000
+      MINIO_BUCKET: customer-care-data
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./customer_care_emails:/opt/airflow/config/customer_care_emails
+      - ./output:/opt/airflow/output
+      - ./:/opt/airflow/project
+    ports:
+      - "8081:8080"
+    command: standalone
+    restart: unless-stopped
+
+volumes:
+  minio_data:
+  airflow_postgres_data:

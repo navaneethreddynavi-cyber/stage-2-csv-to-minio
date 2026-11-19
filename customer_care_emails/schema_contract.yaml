@@ -1,0 +1,56 @@
+dataset_name: customer_care_emails
+
+strict_columns: true
+
+columns:
+  subject:
+    type: string
+    nullable: false
+
+  sender:
+    type: string
+    nullable: false
+
+  receiver:
+    type: string
+    nullable: false
+
+  timestamp:
+    type: timestamp
+    nullable: false
+
+  message_body:
+    type: string
+    nullable: false
+
+  thread_id:
+    type: string
+    nullable: false
+
+  email_types:
+    type: string
+    nullable: false
+
+  email_status:
+    type: string
+    nullable: false
+
+  email_criticality:
+    type: string
+    nullable: false
+
+  product_types:
+    type: string
+    nullable: false
+
+  agent_effectivity:
+    type: string
+    nullable: false
+
+  agent_efficiency:
+    type: string
+    nullable: false
+
+  customer_satisfaction:
+    type: float
+    nullable: false

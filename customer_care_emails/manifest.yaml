@@ -1,0 +1,13 @@
+dataset_name: customer_care_emails
+source: rtweera/customer_care_emails
+owner: Navaneeth Reddy
+status: in_progress
+
+source_format: csv
+source_file: dags/extraction/sample.csv
+
+destination: MinIO
+output_format: parquet
+partition_column: event_date
+
+orchestration: Apache Airflow

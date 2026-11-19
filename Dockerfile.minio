@@ -1,0 +1,18 @@
+FROM alpine:3.22
+
+RUN apk add --no-cache ca-certificates curl
+
+WORKDIR /app
+
+COPY minio-source/minio /usr/bin/minio
+
+RUN chmod +x /usr/bin/minio \
+    && mkdir -p /data
+
+EXPOSE 9000 9001
+
+VOLUME ["/data"]
+
+ENTRYPOINT ["/usr/bin/minio"]
+
+CMD ["server", "/data", "--console-address", ":9001"]
